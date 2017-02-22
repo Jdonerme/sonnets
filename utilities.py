@@ -1,18 +1,17 @@
 import sys
-def import_shakespeare(file="shakespeare.txt"):
+def import_shakespeare(by_sonnet=True, file="shakespeare.txt"):
 	''' imports a txt file in the format given of the shakespeare files.
 
 		Imports the file by constructing a 2D array where each element in
-		the array contains the lines of a sonnet.
+		the array contains a line of a sonnet.
 		Each line contains a list of numbers with each number mapping to 
 		a specific word. Words with punctuation are kept together for now.
 		Returns the sonnets array, word_map, and num_map.
 		(word_map maps words to numbers and num_maps vice versa)
 
 		'''
-	sonnets = []
 	lines = []
-	word_counter = 0
+	num_unique_words = 0
 	word_map = {}
 	num_map = {}
 	with open(file) as f:
@@ -27,18 +26,19 @@ def import_shakespeare(file="shakespeare.txt"):
 					if word in word_map.keys():
 						coded_line.append(word_map[word])
 					else:
-						coded_line.append(word_counter)
-						word_map[word] = word_counter
-						num_map[word_counter] = word
-						word_counter += 1
+						coded_line.append(num_unique_words)
+						word_map[word] = num_unique_words
+						num_map[num_unique_words] = word
+						num_unique_words += 1
 				lines.append(coded_line)
-				if len(lines) == 14:
-					sonnets.append(lines)
-					lines = []
-	return sonnets, word_map, num_map
-'''s, w, n= import_shakespeare()
-for line in s[8]:
+	return lines, word_map, num_map
+''' example use case: writing sonnet 18
+s, _, n= import_shakespeare()
+
+for line in s[17*14:18*14]:
 	for word in line:
 		sys.stdout.write(str(n[word]) + " ")
-	print '\n' '''
+	print '\n' 
+''
+
 

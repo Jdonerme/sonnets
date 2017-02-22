@@ -1,5 +1,5 @@
 import sys
-def import_shakespeare(file="shakespeare.txt"):
+def import_shakespeare(linear=False, file="shakespeare.txt"):
 	''' imports a txt file in the format given of the shakespeare files.
 
 		Imports the file by constructing a 2D array where each element in
@@ -22,15 +22,23 @@ def import_shakespeare(file="shakespeare.txt"):
 				
 			if len(line_split) > 1:
 				coded_line = []
-				for word in line_split:
+				for word_raw in line_split:
+					word = word_raw.lower()
 					if word in word_map.keys():
-						coded_line.append(word_map[word])
+						if not linear:
+							coded_line.append(word_map[word])
+						else:
+							lines.append(word_map[word])
 					else:
-						coded_line.append(num_unique_words)
+						if not linear:
+							coded_line.append(num_unique_words)
+						else:
+							lines.append(num_unique_words)
 						word_map[word] = num_unique_words
 						num_map[num_unique_words] = word
 						num_unique_words += 1
-				lines.append(coded_line)
+				if not linear:
+					lines.append(coded_line)
 	return lines, word_map, num_map
 ''' example use case: writing sonnet 18
 s, _, n= import_shakespeare()
@@ -40,5 +48,6 @@ for line in s[17*14:18*14]:
 		sys.stdout.write(str(n[word]) + " ")
 	print '\n' 
 '''
+
 
 

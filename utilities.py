@@ -1,5 +1,9 @@
 import sys
 import random
+from nltk.corpus import cmudict 
+
+SYLLABLE_DICT = cmudict.dict()
+PUNCTUATION = ",!?()'.:;"
 
 def import_shakespeare(linear=False, file="shakespeare.txt"):
     ''' imports a txt file in the format given of the shakespeare files.
@@ -89,6 +93,14 @@ def generate_emission(M, A, O, num_map, num_lines=14):
 
     return emission
 
+def num_syllables(word):
+    try:
+        temp = word.strip(PUNCTUATION)
+        return [len(list(y for y in x if y[-1].isdigit())) \
+        for x in SYLLABLE_DICT[temp]][0]
+    except Exception as e:
+        return 1
+
 ''' example use case: writing sonnet 18
 s, _, n= import_shakespeare()
 
@@ -98,5 +110,13 @@ for line in s[17*14:18*14]:
     print '\n' 
 '''
 
+'''s, _, num_map = import_shakespeare()
+count = 0
+for i in range(len(num_map)):
+    #print num_map[i]
 
-
+    val = num_syllables(num_map[i])
+    if val == False:
+        count += 1
+    print count
+'''

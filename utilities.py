@@ -1,5 +1,5 @@
 import sys
-def import_shakespeare(by_sonnet=True, file="shakespeare.txt"):
+def import_shakespeare(file="shakespeare.txt"):
 	''' imports a txt file in the format given of the shakespeare files.
 
 		Imports the file by constructing a 2D array where each element in

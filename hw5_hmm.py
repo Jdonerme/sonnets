@@ -1,6 +1,14 @@
 import utilities as ut
 import random
 import numpy as np
+import curses
+from curses.ascii import isdigit
+import nltk
+from nltk.corpus import cmudict
+
+def nsyl(word):
+    d = cmudict.dict()
+    return [len(list(y for y in x if isdigit(y[-1]))) for x in d[word.lower()]]
 
 class HiddenMarkovModel:
     '''
@@ -262,6 +270,7 @@ class HiddenMarkovModel:
 
         for l in range(num_lines):
             for t in range(M):
+
                 # Sample next observation.
                 rand_var = random.uniform(0, 1)
                 next_obs = 0
@@ -272,9 +281,12 @@ class HiddenMarkovModel:
 
                 next_obs -= 1
                 if t == 0:
-                    emission += num_map[next_obs].title() + ' '
+                    word = num_map[next_obs].title() + ' '
+                    #print(nsyl(word))
+                    emission += word
                 else:
-                    emission += num_map[next_obs] + ' '
+                    word = num_map[next_obs] + ' '
+                    emission += word
 
                 # Sample next state.
                 rand_var = random.uniform(0, 1)
@@ -425,4 +437,4 @@ if __name__ == '__main__':
     print('')
     print('')
 
-    run_hmm(10, 8, 14)
+    run_hmm(4, 8, 14)

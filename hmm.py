@@ -13,14 +13,6 @@ print 'getting the model'
 model = MultinomialHMM(n_components=NUM_WORDS)
 print 'fitting'
 model.fit(lines)
-print 'yay'
-for _ in range(14):
-    seed = np.random.randint(0, NUM_WORDS)
-    model.random_state = seed
-    samples = model.sample(n_samples=8)[1]
-    for state in samples:
-        word = num_map[state]
-        if state == samples[0]:
-            word = word.capitalize()
-        sys.stdout.write(word + ' ')
-    print
+print 'sonnet:\n'
+x = ut.generate_emission(8, model.transmat_, model.emissionprob_, num_map)
+print("{:30}".format(x))

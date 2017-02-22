@@ -1,4 +1,5 @@
 import sys
+import random
 def import_shakespeare(linear=False, file="shakespeare.txt"):
 	''' imports a txt file in the format given of the shakespeare files.
 
@@ -40,6 +41,52 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
 				if not linear:
 					lines.append(coded_line)
 	return lines, word_map, num_map
+def generate_emission(M, A, O, num_map, num_lines=14):
+    '''
+    Generates an emission of length M, assuming that the starting state
+    is chosen uniformly at random.
+
+    Arguments:
+        M:          Length of the emission to generate.
+
+    Returns:
+        emission:   The randomly generated emission as a string.
+    '''
+
+    emission = ''
+    L = len(A)
+    state = random.choice(range(L))
+
+    for l in range(num_lines):
+        for t in range(M):
+            # Sample next observation.
+            rand_var = random.uniform(0, 1)
+            next_obs = 0
+
+            while rand_var > 0:
+                rand_var -= O[state][next_obs]
+                next_obs += 1
+
+            next_obs -= 1
+            if t == 0:
+                emission += num_map[next_obs].title() + ' '
+            else:
+                emission += num_map[next_obs] + ' '
+
+            # Sample next state.
+            rand_var = random.uniform(0, 1)
+            next_state = 0
+
+            while rand_var > 0:
+                rand_var -= A[state][next_state]
+                next_state += 1
+
+            next_state -= 1
+            state = next_state
+        emission += '\n'
+
+    return emission
+
 ''' example use case: writing sonnet 18
 s, _, n= import_shakespeare()
 

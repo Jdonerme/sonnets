@@ -1,14 +1,6 @@
 import utilities as ut
 import random
 import numpy as np
-import curses
-from curses.ascii import isdigit
-import nltk
-from nltk.corpus import cmudict
-
-def nsyl(word):
-    d = cmudict.dict()
-    return [len(list(y for y in x if isdigit(y[-1]))) for x in d[word.lower()]]
 
 class HiddenMarkovModel:
     '''
@@ -253,56 +245,6 @@ class HiddenMarkovModel:
                 for xt in range(self.D):
                     self.O[curr][xt] = O_num[curr][xt] / O_den[curr]
 
-    def generate_emission(self, M, num_lines, num_map):
-        '''
-        Generates an emission of length M, assuming that the starting state
-        is chosen uniformly at random.
-
-        Arguments:
-            M:          Length of the emission to generate.
-
-        Returns:
-            emission:   The randomly generated emission as a string.
-        '''
-
-        emission = ''
-        state = random.choice(range(self.L))
-
-        for l in range(num_lines):
-            for t in range(M):
-
-                # Sample next observation.
-                rand_var = random.uniform(0, 1)
-                next_obs = 0
-
-                while rand_var > 0:
-                    rand_var -= self.O[state][next_obs]
-                    next_obs += 1
-
-                next_obs -= 1
-                if t == 0:
-                    word = num_map[next_obs].title() + ' '
-                    #print(nsyl(word))
-                    emission += word
-                else:
-                    word = num_map[next_obs] + ' '
-                    emission += word
-
-                # Sample next state.
-                rand_var = random.uniform(0, 1)
-                next_state = 0
-
-                while rand_var > 0:
-                    rand_var -= self.A[state][next_state]
-                    next_state += 1
-
-                next_state -= 1
-                state = next_state
-            emission += '\n'
-
-        return emission
-
-
     def probability_alphas(self, x):
         '''
         Finds the maximum probability of a given input sequence using
@@ -391,7 +333,7 @@ def unsupervised_HMM(X, n_states):
 
     return HMM
 
-def run_hmm(n_states, M, num_lines):
+def run_hmm(n_states, M, num_lines, verbose=False):
     '''
     Trains an HMM using supervised learning on the file 'ron.txt' and
     prints the results.  Generates an emission of length M.
@@ -404,25 +346,25 @@ def run_hmm(n_states, M, num_lines):
     # Train the HMM.
     HMM = unsupervised_HMM(sonnets, n_states)
 
+    if verbose:
+        # Print the transition matrix.
+        print("Transition Matrix:")
+        print('#' * 70)
+        for i in range(len(HMM.A)):
+            print(''.join("{:<12.3e}".format(HMM.A[i][j]) for j in range(len(HMM.A[i]))))
+        print('')
+        print('')
 
-    # Print the transition matrix.
-    print("Transition Matrix:")
-    print('#' * 70)
-    for i in range(len(HMM.A)):
-        print(''.join("{:<12.3e}".format(HMM.A[i][j]) for j in range(len(HMM.A[i]))))
-    print('')
-    print('')
-
-    # Print the observation matrix.
-    print("Observation Matrix:  ")
-    print('#' * 70)
-    for i in range(len(HMM.O)):
-        print(''.join("{:<12.3e}".format(HMM.O[i][j]) for j in range(len(HMM.O[i]))))
-    print('')
-    print('')
+        # Print the observation matrix.
+        print("Observation Matrix:  ")
+        print('#' * 70)
+        for i in range(len(HMM.O)):
+            print(''.join("{:<12.3e}".format(HMM.O[i][j]) for j in range(len(HMM.O[i]))))
+        print('')
+        print('')
 
     # Generate a single input sequence of length m.
-    x = HMM.generate_emission(M, num_lines, num_map)
+    x = ut.generate_emission(M, HMM.A, HMM.O, num_map, num_lines)
 
     # Print the results.
     print("{:30}".format(x))
@@ -437,4 +379,4 @@ if __name__ == '__main__':
     print('')
     print('')
 
-    run_hmm(4, 8, 14)
+    run_hmm(10, 8, 14)

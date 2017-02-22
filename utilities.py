@@ -39,6 +39,6 @@ for line in s[17*14:18*14]:
 	for word in line:
 		sys.stdout.write(str(n[word]) + " ")
 	print '\n' 
-''
+'''
 
 

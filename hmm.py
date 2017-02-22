@@ -2,6 +2,7 @@ import utilities as ut
 import numpy as np
 from hmmlearn.hmm import MultinomialHMM
 import sys
+
 print 'getting the data'
 NUM_WORDS = 300
 lines, word_map, num_map = ut.import_shakespeare(linear=True)

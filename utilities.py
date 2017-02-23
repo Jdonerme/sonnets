@@ -122,7 +122,7 @@ def generate_emission(A, O, num_map, num_lines=14, syl_per_line=[10] * 14):
             if t + num_syl <= syl_per_line[l]:
                 if t == 0:
                     # Lines should never start with punctuation
-                    if word not in '!.:,?;':
+                    if word not in PUNCTUATION or word.endswith('"') in PUNCTUATION:
                         emission += word.capitalize()
                 else:
                     # Lines shouldn't include this punctuation in the middle
@@ -136,10 +136,13 @@ def generate_emission(A, O, num_map, num_lines=14, syl_per_line=[10] * 14):
                 # Sample next state.
                 next_state = np.random.choice(range(len(A[state])), p=A[state])
                 state = next_state
-        if word in '!.,?':
+        if word in '!.,:;?':
             emission += word
         else:
-            emission += '.'
+            if l == num_lines-1:
+                emission += '.'
+            else:
+                emission += ','
         emission += '\n'
 
     return emission

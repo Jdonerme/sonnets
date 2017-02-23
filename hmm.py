@@ -4,14 +4,13 @@ from hmmlearn.hmm import MultinomialHMM
 import sys
 
 print 'getting the data'
-NUM_WORDS = 300
 lines, word_map, num_map, rhyme_dict = ut.import_shakespeare(linear=True)
-lines = np.reshape(lines,(-1, 1))[:NUM_WORDS]
+lines = np.reshape(lines,(-1, 1))
 states = word_map.keys()
 n_states = len(states)
 
 print 'getting the model'
-model = MultinomialHMM(n_components=NUM_WORDS)
+model = MultinomialHMM(n_components=10)
 print 'fitting'
 model.fit(lines)
 print 'Sonnet:'

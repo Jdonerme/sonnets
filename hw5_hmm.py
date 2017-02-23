@@ -341,7 +341,7 @@ def run_hmm(n_states, num_lines, verbose=False):
     Arguments:
         n_states:   Number of hidden states that the HMM should have.
     '''
-    sonnets, word_map, num_map, _ = ut.import_shakespeare()
+    sonnets, word_map, num_map, rhyme_dict = ut.import_shakespeare()
 
     # Train the HMM.
     HMM = unsupervised_HMM(sonnets, n_states)
@@ -364,9 +364,14 @@ def run_hmm(n_states, num_lines, verbose=False):
         print('')
 
     # Generate a single input sequence of length m.
-    x = ut.generate_emission(HMM.A, HMM.O, num_map, num_lines)
+    print 'Sonnet:'
+    x = ut.generate_emission(HMM.A, HMM.O, num_map, num_lines, rhyme_dict=rhyme_dict)
 
     # Print the results.
+    print("{:30}".format(x))
+
+    print 'Haiku:'
+    x = ut.generate_emission(HMM.A, HMM.O, num_map, 3, [5, 7, 5])
     print("{:30}".format(x))
 
 

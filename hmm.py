@@ -14,6 +14,10 @@ print 'getting the model'
 model = MultinomialHMM(n_components=NUM_WORDS)
 print 'fitting'
 model.fit(lines)
-print 'sonnet:\n'
-x = ut.generate_emission(8, model.transmat_, model.emissionprob_, num_map)
+print 'Sonnet:'
+x = ut.generate_emission(model.transmat_, model.emissionprob_, num_map)
+print("{:30}".format(x))
+
+print 'Haiku:'
+x = ut.generate_emission(model.transmat_, model.emissionprob_, num_map, 3, [5, 7, 5])
 print("{:30}".format(x))

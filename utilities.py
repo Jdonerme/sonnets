@@ -1,6 +1,7 @@
 import sys
 import random
 from nltk.corpus import cmudict 
+import numpy as np
 
 SYLLABLE_DICT = cmudict.dict()
 PUNCTUATION = ",!?()'.:;"
@@ -47,7 +48,7 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
                     lines.append(coded_line)
     return lines, word_map, num_map
 
-def generate_emission(M, A, O, num_map, num_lines=14):
+def generate_emission(A, O, num_map, num_lines=14, syl_per_line=[10] * 14):
     '''
     Generates an emission of length M, assuming that the starting state
     is chosen uniformly at random.
@@ -64,42 +65,43 @@ def generate_emission(M, A, O, num_map, num_lines=14):
     state = random.choice(range(L))
 
     for l in range(num_lines):
-        for t in range(M):
+        t = 0
+        while t < syl_per_line[l]:
             # Sample next observation.
-            rand_var = random.uniform(0, 1)
-            next_obs = 0
+            next_obs = np.random.choice(range(len(O[state])), p=O[state])
+            word = num_map[next_obs]
+            num_syl = num_syllables(word)
+            if t + num_syl <= syl_per_line[l]:
+                if t == 0:
+                    emission += word.capitalize() + ' '
+                else:
+                    emission += word + ' '
+                t += num_syl
 
-            while rand_var > 0:
-                rand_var -= O[state][next_obs]
-                next_obs += 1
-
-            next_obs -= 1
-            if t == 0:
-                emission += num_map[next_obs].capitalize() + ' '
-            else:
-                emission += num_map[next_obs] + ' '
-
-            # Sample next state.
-            rand_var = random.uniform(0, 1)
-            next_state = 0
-
-            while rand_var > 0:
-                rand_var -= A[state][next_state]
-                next_state += 1
-
-            next_state -= 1
-            state = next_state
+                # Sample next state.
+                next_state = np.random.choice(range(len(A[state])), p=A[state])
+                state = next_state
         emission += '\n'
 
     return emission
 
 def num_syllables(word):
+    temp = word.lower().strip(PUNCTUATION)
     try:
-        temp = word.strip(PUNCTUATION)
         return [len(list(y for y in x if y[-1].isdigit())) \
         for x in SYLLABLE_DICT[temp]][0]
     except Exception as e:
-        return 1
+        if '-' in temp:
+            sub_temp = temp.split('-')
+            return sum([num_syllables(w) for w in sub_temp])
+        elif temp.endswith("'s"):
+            return num_syllables(temp.strip("'s"))
+        elif len(temp) <= 5:
+            return 1
+        elif len(temp) <= 10:
+            return 2
+        else:
+            return 3
 
 ''' example use case: writing sonnet 18
 s, _, n= import_shakespeare()

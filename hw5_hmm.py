@@ -364,7 +364,7 @@ def run_hmm(n_states, M, num_lines, verbose=False):
         print('')
 
     # Generate a single input sequence of length m.
-    x = ut.generate_emission(M, HMM.A, HMM.O, num_map, num_lines)
+    x = ut.generate_emission(HMM.A, HMM.O, num_map, num_lines)
 
     # Print the results.
     print("{:30}".format(x))

@@ -60,7 +60,6 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
                LINES_IN_POEM = 15
             elif line_split and line_split[0] == str(100):
                 LINES_IN_POEM = 14
-
             if len(line_split) > 2:
                 coded_line = []
                 for word_raw in line_split:
@@ -80,13 +79,20 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
                         num_unique_words += 1
                 if line_index == LINES_IN_POEM:
                     rhyme = prev_rhymes[1]
+                    if word in PUNCTUATION:
+                        word = line_split[-2].lower()
                     rhyme_dict = append_to_dict_set(rhyme_dict, word, rhyme)
 
                 elif line_index in [3, 4, (LINES_IN_POEM - 7), (LINES_IN_POEM - 6), (LINES_IN_POEM - 3), (LINES_IN_POEM - 2)]:
                     rhyme = prev_rhymes[0]
+                    if word in PUNCTUATION:
+                        word = line_split[-2].lower()
                     rhyme_dict = append_to_dict_set(rhyme_dict, word, rhyme)
                	prev_rhymes[0] = prev_rhymes[1]
-               	prev_rhymes[1] = word
+                if word not in PUNCTUATION:
+               	    prev_rhymes[1] = word
+                else:
+                    prev_rhymes[1] = line_split[-2].lower()
                 if not linear:
                         lines.append(coded_line)
 
@@ -167,12 +173,13 @@ def num_syllables(word):
         else:
             return 3
         return 1
-''' s, _, n, rhyme_dict = import_shakespeare
-    for line in s[17*14:18*14]:
-        for word in line:
-            sys.stdout.write(str(n[word]) + " ")
-        print '\n'
-    print rhyme_dict['love']'''
+'''s, _, n, rhyme_dict = import_shakespeare()
+for line in s[17*14:18*14]:
+    for word in line:
+        sys.stdout.write(str(n[word]) + " ")
+    print '\n'
+print rhyme_dict['trust']
+'''
 
 '''s, _, num_map = import_shakespeare()
 count = 0

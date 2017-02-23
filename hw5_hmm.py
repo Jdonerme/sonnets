@@ -341,7 +341,7 @@ def run_hmm(n_states, M, num_lines, verbose=False):
     Arguments:
         n_states:   Number of hidden states that the HMM should have.
     '''
-    sonnets, word_map, num_map = ut.import_shakespeare()
+    sonnets, word_map, num_map, _ = ut.import_shakespeare()
 
     # Train the HMM.
     HMM = unsupervised_HMM(sonnets, n_states)

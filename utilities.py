@@ -1,10 +1,30 @@
 import sys
 import random
+from sets import Set
 from nltk.corpus import cmudict 
 import numpy as np
 
 SYLLABLE_DICT = cmudict.dict()
 PUNCTUATION = ",!?()'.:;"
+def append_to_dict_set(d, word_raw, rhyme_raw, repeat=True):
+    word = word_raw.strip(PUNCTUATION)
+    rhyme = rhyme_raw.strip(PUNCTUATION)
+    if rhyme is None:
+        return d
+    if word in d:
+        d[word] |= set([rhyme])
+    else:
+        d[word] = set([rhyme])
+    if rhyme in d:
+            d[word] |= d[rhyme]
+    if repeat:
+        d = append_to_dict_set(d, rhyme, word, False)
+    if word in d[word]:
+        temp = d[word]
+        temp.remove(word)
+        d[word] = temp
+    return d
+
 
 def import_shakespeare(linear=False, file="shakespeare.txt"):
     ''' imports a txt file in the format given of the shakespeare files.
@@ -17,17 +37,30 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
         (word_map maps words to numbers and num_maps vice versa)
 
         '''
+    LINES_IN_POEM = 14
     lines = []
     num_unique_words = 0
     word_map = {}
     num_map = {}
+    rhyme_dict = {}
+    line_index = 1
+    prev_rhymes = [None, None]
     with open(file) as f:
         for line in f:
             line_split = line.strip('\n').split(" ")
             if '' in line_split:
                 line_split = filter(lambda a: a != '', line_split)
-                
-            if len(line_split) > 1:
+            # account for some edge poems
+            if line_split and line_split[0] == str(126):
+               LINES_IN_POEM = 12
+            elif line_split and line_split[0] == str(127):
+                LINES_IN_POEM = 14
+            if line_split and line_split[0] == str(99):
+               LINES_IN_POEM = 15
+            elif line_split and line_split[0] == str(100):
+                LINES_IN_POEM = 14
+
+            if len(line_split) > 2:
                 coded_line = []
                 for word_raw in line_split:
                     word = word_raw.lower()
@@ -44,9 +77,23 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
                         word_map[word] = num_unique_words
                         num_map[num_unique_words] = word
                         num_unique_words += 1
+                if line_index == LINES_IN_POEM:
+                    rhyme = prev_rhymes[1]
+                    rhyme_dict = append_to_dict_set(rhyme_dict, word, rhyme)
+
+                elif line_index in [3, 4, (LINES_IN_POEM - 7), (LINES_IN_POEM - 6), (LINES_IN_POEM - 3), (LINES_IN_POEM - 2)]:
+                    rhyme = prev_rhymes[0]
+                    rhyme_dict = append_to_dict_set(rhyme_dict, word, rhyme)
+               	prev_rhymes[0] = prev_rhymes[1]
+               	prev_rhymes[1] = word
                 if not linear:
-                    lines.append(coded_line)
-    return lines, word_map, num_map
+                        lines.append(coded_line)
+               
+            else: # we're done with the sonnet
+                prev_rhymes[0], prev_rhymes[1] = None, None
+                line_index = 0
+            line_index += 1
+    return lines, word_map, num_map, rhyme_dict
 
 def generate_emission(A, O, num_map, num_lines=14, syl_per_line=[10] * 14):
     '''
@@ -91,6 +138,7 @@ def num_syllables(word):
         return [len(list(y for y in x if y[-1].isdigit())) \
         for x in SYLLABLE_DICT[temp]][0]
     except Exception as e:
+<<<<<<< Updated upstream
         if '-' in temp:
             sub_temp = temp.split('-')
             return sum([num_syllables(w) for w in sub_temp])
@@ -111,6 +159,15 @@ for line in s[17*14:18*14]:
         sys.stdout.write(str(n[word]) + " ")
     print '\n' 
 '''
+=======
+        return 1
+''' s, _, n, rhyme_dict = import_shakespeare
+    for line in s[17*14:18*14]:
+        for word in line:
+            sys.stdout.write(str(n[word]) + " ")
+        print '\n'
+    print rhyme_dict['love']'''
+>>>>>>> Stashed changes
 
 '''s, _, num_map = import_shakespeare()
 count = 0

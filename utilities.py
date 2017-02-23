@@ -5,6 +5,7 @@ from nltk.corpus import cmudict
 import numpy as np
 import re
 import pronouncing
+import json
 
 SYLLABLE_DICT = cmudict.dict()
 PUNCTUATION = ",!?()'.:;"
@@ -221,6 +222,14 @@ def num_syllables(word):
         else:
             return 3
         return 1
+def print_rhyme_dict():
+    _, _, _, rhyme_dict = import_shakespeare()
+    new_dict = {}
+    for key, val in rhyme_dict.iteritems():
+        new_dict[key] = list(val)
+    with open('output.txt', 'w') as f:
+        json.dump(new_dict, f)
+
 '''def main():
     s, _, n, rhyme_dict = import_shakespeare()
     #for line in s[17*14:18*14]:

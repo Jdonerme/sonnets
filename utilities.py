@@ -138,7 +138,6 @@ def num_syllables(word):
         return [len(list(y for y in x if y[-1].isdigit())) \
         for x in SYLLABLE_DICT[temp]][0]
     except Exception as e:
-<<<<<<< Updated upstream
         if '-' in temp:
             sub_temp = temp.split('-')
             return sum([num_syllables(w) for w in sub_temp])
@@ -150,16 +149,6 @@ def num_syllables(word):
             return 2
         else:
             return 3
-
-''' example use case: writing sonnet 18
-s, _, n= import_shakespeare()
-
-for line in s[17*14:18*14]:
-    for word in line:
-        sys.stdout.write(str(n[word]) + " ")
-    print '\n' 
-'''
-=======
         return 1
 ''' s, _, n, rhyme_dict = import_shakespeare
     for line in s[17*14:18*14]:
@@ -167,7 +156,6 @@ for line in s[17*14:18*14]:
             sys.stdout.write(str(n[word]) + " ")
         print '\n'
     print rhyme_dict['love']'''
->>>>>>> Stashed changes
 
 '''s, _, num_map = import_shakespeare()
 count = 0

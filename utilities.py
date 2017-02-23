@@ -1,8 +1,9 @@
 import sys
 import random
 from sets import Set
-from nltk.corpus import cmudict 
+from nltk.corpus import cmudict
 import numpy as np
+import re
 
 SYLLABLE_DICT = cmudict.dict()
 PUNCTUATION = ",!?()'.:;"
@@ -31,7 +32,7 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
 
         Imports the file by constructing a 2D array where each element in
         the array contains a line of a sonnet.
-        Each line contains a list of numbers with each number mapping to 
+        Each line contains a list of numbers with each number mapping to
         a specific word. Words with punctuation are kept together for now.
         Returns the sonnets array, word_map, and num_map.
         (word_map maps words to numbers and num_maps vice versa)
@@ -47,7 +48,7 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
     prev_rhymes = [None, None]
     with open(file) as f:
         for line in f:
-            line_split = line.strip('\n').split(" ")
+            line_split = re.findall(r"[\w']+|[.,!?;]", line.strip('\n'))
             if '' in line_split:
                 line_split = filter(lambda a: a != '', line_split)
             # account for some edge poems
@@ -88,7 +89,7 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
                	prev_rhymes[1] = word
                 if not linear:
                         lines.append(coded_line)
-               
+
             else: # we're done with the sonnet
                 prev_rhymes[0], prev_rhymes[1] = None, None
                 line_index = 0
@@ -120,7 +121,8 @@ def generate_emission(A, O, num_map, num_lines=14, syl_per_line=[10] * 14):
             num_syl = num_syllables(word)
             if t + num_syl <= syl_per_line[l]:
                 if t == 0:
-                    emission += word.capitalize() + ' '
+                    if word not in '!.:,':
+                        emission += word.capitalize() + ' '
                 else:
                     emission += word + ' '
                 t += num_syl
@@ -135,6 +137,8 @@ def generate_emission(A, O, num_map, num_lines=14, syl_per_line=[10] * 14):
 def num_syllables(word):
     temp = word.lower().strip(PUNCTUATION)
     try:
+        if temp == "":
+            return 0
         return [len(list(y for y in x if y[-1].isdigit())) \
         for x in SYLLABLE_DICT[temp]][0]
     except Exception as e:

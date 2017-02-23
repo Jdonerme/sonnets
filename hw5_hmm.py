@@ -333,7 +333,7 @@ def unsupervised_HMM(X, n_states):
 
     return HMM
 
-def run_hmm(n_states, M, num_lines, verbose=False):
+def run_hmm(n_states, num_lines, verbose=False):
     '''
     Trains an HMM using supervised learning on the file 'ron.txt' and
     prints the results.  Generates an emission of length M.
@@ -379,4 +379,5 @@ if __name__ == '__main__':
     print('')
     print('')
 
-    run_hmm(10, 8, 14)
+    # Number of states, number of M, number of lines
+    run_hmm(7, 14)

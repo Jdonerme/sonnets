@@ -4,6 +4,7 @@ from sets import Set
 from nltk.corpus import cmudict
 import numpy as np
 import re
+import pronouncing
 
 SYLLABLE_DICT = cmudict.dict()
 PUNCTUATION = ",!?()'.:;"
@@ -102,7 +103,7 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
             line_index += 1
     return lines, word_map, num_map, rhyme_dict
 
-def generate_emission(A, O, num_map, num_lines=14, syl_per_line=[10] * 14):
+def generate_emission(A, O, num_map, num_lines=14, syl_per_line=[10] * 14, rhyme_dict=None):
     '''
     Generates an emission of length M, assuming that the starting state
     is chosen uniformly at random.
@@ -115,6 +116,7 @@ def generate_emission(A, O, num_map, num_lines=14, syl_per_line=[10] * 14):
     '''
 
     emission = ''
+    prev_rhymes = [None, None]
     L = len(A)
     state = random.choice(range(L))
 
@@ -128,14 +130,45 @@ def generate_emission(A, O, num_map, num_lines=14, syl_per_line=[10] * 14):
             if t + num_syl <= syl_per_line[l]:
                 if t == 0:
                     # Lines should never start with punctuation
-                    if word not in PUNCTUATION or word.endswith('"') in PUNCTUATION:
+                    if word not in PUNCTUATION:
                         emission += word.capitalize()
+                    
+                elif t + num_syl == syl_per_line[l] and rhyme_dict:
+                    if l in [2, 3, 6, 7, 10, 11, 13]:
+                        to_add = []
+                        prev = prev_rhymes[0]
+                        if l == 13:
+                            prev = prev_rhymes[1]
+                        if prev in rhyme_dict:
+                            for rhyme in rhyme_dict[prev]:
+                                if num_syllables(rhyme) == num_syl:
+                                    to_add.append(rhyme)
+                        else:
+                            all_rhymes = pronouncing.rhymes(prev)
+                            common = list(set(num_map.values()).intersection(set(all_rhymes)))
+                            if common != []:
+                                for rhyme in common:
+                                    if num_syllables(rhyme) == num_syl:
+                                        to_add.append(rhyme)
+                            else:
+                                for rhyme in all_rhymes:
+                                    if num_syllables(rhyme) == num_syl:
+                                        to_add.append(rhyme)
+
+                        if to_add != []:
+                            word = np.random.choice(to_add)
+                            
+                    emission += ' ' + word
+                    prev_rhymes[0] = prev_rhymes[1]
+                    prev_rhymes[1] = word.lower().strip(PUNCTUATION)
+
                 else:
                     # Lines shouldn't include this punctuation in the middle
                     if word not in PUNCTUATION:
                         emission += ' ' + word
                     elif word in ',!:;':
-                        emission +=  word
+                       if emission[-1] not in PUNCTUATION:
+                             emission +=  word
 
                 t += num_syl
 

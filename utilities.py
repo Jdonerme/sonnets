@@ -11,12 +11,18 @@ PUNCTUATION = ",!?()'.:;"
 def append_to_dict_set(d, word_raw, rhyme_raw, repeat=True):
     word = word_raw.strip(PUNCTUATION)
     rhyme = rhyme_raw.strip(PUNCTUATION)
+    if word == '' or rhyme == '':
+        return d
+
     if rhyme is None:
         return d
     if word in d:
+        for other_rhyme in d[word]:
+            d[other_rhyme] |= set([rhyme])
         d[word] |= set([rhyme])
     else:
         d[word] = set([rhyme])
+
     if rhyme in d:
             d[word] |= d[rhyme]
     if repeat:
@@ -54,7 +60,7 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
                 line_split = filter(lambda a: a != '', line_split)
             # account for some edge poems
             if line_split and line_split[0] == str(126):
-               LINES_IN_POEM = 12
+                LINES_IN_POEM = 12
             elif line_split and line_split[0] == str(127):
                 LINES_IN_POEM = 14
             if line_split and line_split[0] == str(99):
@@ -65,6 +71,7 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
                 coded_line = []
                 for word_raw in line_split:
                     word = word_raw.lower()
+
                     if word in word_map.keys():
                         if not linear:
                             coded_line.append(word_map[word])
@@ -83,6 +90,14 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
                     if word in PUNCTUATION:
                         word = line_split[-2].lower()
                     rhyme_dict = append_to_dict_set(rhyme_dict, word, rhyme)
+                   
+                elif (LINES_IN_POEM) == 12:
+                    if line_index % 2 == 0 and line_index > 0:
+                        rhyme = prev_rhymes[1]
+                        if word in PUNCTUATION:
+                            word = line_split[-2].lower()
+                        rhyme_dict = append_to_dict_set(rhyme_dict, word, rhyme)
+                        prev_rhymes[0] = prev_rhymes[1]
 
                 elif line_index in [3, 4, (LINES_IN_POEM - 7), (LINES_IN_POEM - 6), (LINES_IN_POEM - 3), (LINES_IN_POEM - 2)]:
                     rhyme = prev_rhymes[0]
@@ -143,7 +158,7 @@ def generate_emission(A, O, num_map, num_lines=14, syl_per_line=[10] * 14, rhyme
                             for rhyme in rhyme_dict[prev]:
                                 if num_syllables(rhyme) == num_syl:
                                     to_add.append(rhyme)
-                        else:
+                        if to_add == []:
                             all_rhymes = pronouncing.rhymes(prev)
                             common = list(set(num_map.values()).intersection(set(all_rhymes)))
                             if common != []:
@@ -206,12 +221,13 @@ def num_syllables(word):
         else:
             return 3
         return 1
-'''s, _, n, rhyme_dict = import_shakespeare()
-for line in s[17*14:18*14]:
-    for word in line:
-        sys.stdout.write(str(n[word]) + " ")
-    print '\n'
-print rhyme_dict['trust']
+'''def main():
+    s, _, n, rhyme_dict = import_shakespeare()
+    #for line in s[17*14:18*14]:
+    #    for word in line:
+    #       sys.stdout.write(str(n[word]) + " ")
+    #    print '\n'
+    return rhyme_dict
 '''
 
 '''s, _, num_map = import_shakespeare()

@@ -141,6 +141,7 @@ def import_general(file='rap.txt', linear=False):
             if '' in line_split:
                 line_split = filter(lambda a: a != '', line_split)
             if '[' in line_split or ']' in line_split:
+                print line_split
                 continue
 
             if len(line_split) > 2:
@@ -441,14 +442,12 @@ def generate_rap(A, O, num_map, num_lines=20):
     prev_rhymes = [None, None, None]
     L = len(A)
     state = random.choice(range(L))
-
-    line_count = -1
-    for l in range(num_lines):
-        line_count += 1
+    
+    for line_count in range(num_lines):
         if line_count % 5 == 0: 
             emission += '\n'
         if line_count % 5 in [2, 3]:
-            syl_per_line = 5
+            syl_per_line = 6
         else:
             syl_per_line = random.choice([11, 12, 9, 10])
         t = 0
@@ -466,7 +465,7 @@ def generate_rap(A, O, num_map, num_lines=20):
                     #if word not in PUNCTUATION:
                     emission += word.capitalize()
                     
-                elif t + num_syl - syl_per_line == 0:
+                elif t + num_syl - syl_per_line == 0 or t + num_syl - syl_per_line == 1:
                     #t += syl_per_line # ending line
                     to_add = []
                     if line_count % 5 in [1, 3, 4]:
@@ -474,22 +473,24 @@ def generate_rap(A, O, num_map, num_lines=20):
                         if line_count % 5 == 4:
                             prev = prev_rhymes[0]
 
-                
                         all_rhymes = pronouncing.rhymes(prev)
                         common = list(set(num_map.values()).intersection(set(all_rhymes)))
                         if common != []:
                             for rhyme in common:
-                                if num_syllables(rhyme) == num_syl:
+                                if num_syllables(rhyme) == num_syl or num_syllables(rhyme) == num_syl - 1:
                                     to_add.append(rhyme)
                         else:
                             for rhyme in all_rhymes:
-                                if num_syllables(rhyme) == num_syl:
+                                if (num_syllables(rhyme) == num_syl or num_syllables(rhyme) == num_syl - 1) and len(rhyme) > 1:
                                     to_add.append(rhyme)
+                            if to_add == []:
+                                for rhyme in all_rhymes:
+                                    if (num_syllables(rhyme) == num_syl or num_syllables(rhyme) == num_syl - 1):
+                                        to_add.append(rhyme)
 
                         if to_add != []:
                             word = np.random.choice(to_add)
                            
-                            
                     emission += ' ' + word
                     prev_rhymes[0] = prev_rhymes[1]
                     prev_rhymes[1] = prev_rhymes[2]
@@ -511,7 +512,7 @@ def generate_rap(A, O, num_map, num_lines=20):
         if word in '!.,:;?':
             emission += word
         else:
-            if l == num_lines-1:
+            if line_count % 5 == 4:
                 emission += '.'
             else:
                 emission += ','

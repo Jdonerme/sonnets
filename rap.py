@@ -8,7 +8,7 @@ lines, word_map, num_map, rhyme_dict = ut.import_general(file="rap.txt", linear=
 lines = np.reshape(lines,(-1, 1))
 
 print 'getting the model'
-model = MultinomialHMM(n_components=8, n_iter=500)
+model = MultinomialHMM(n_components=10, n_iter=5000)
 print 'fitting'
 model.fit(lines)
 print 'Rap:'
@@ -17,5 +17,5 @@ print("{:30}".format(x))
 
 
 
-#print 'visualizing'
-#ut.visualize(model.transmat_, model.emissionprob_, num_map)
+print 'visualizing'
+ut.visualize(model.transmat_, model.emissionprob_, num_map)

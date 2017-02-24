@@ -19,5 +19,9 @@ print 'Haiku:'
 x = ut.generate_emission(model.transmat_, model.emissionprob_, num_map, 3, [5, 7, 5])
 print("{:30}".format(x))
 
+print 'Limerick'
+x = ut.generate_limerick(model.transmat_, model.emissionprob_, num_map, 5, [8, 8, 5, 5, 8], rhyme_dict=rhyme_dict)
+print("{:30}".format(x))
+
 print 'visualizing'
 ut.visualize(model.transmat_, model.emissionprob_, num_map)

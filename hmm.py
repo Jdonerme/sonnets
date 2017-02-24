@@ -4,7 +4,7 @@ from hmmlearn.hmm import MultinomialHMM
 import sys
 
 print 'getting the data'
-lines, word_map, num_map, rhyme_dict = ut.import_shakespeare(linear=True)
+lines, word_map, num_map, rhyme_dict = ut.import_full(linear=True)
 lines = np.reshape(lines,(-1, 1))
 states = word_map.keys()
 n_states = len(states)

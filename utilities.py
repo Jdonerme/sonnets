@@ -122,6 +122,63 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
             line_index += 1
     return lines, word_map, num_map, rhyme_dict
 
+def import_general(file='rap.txt', linear=False):
+    ''' Imports additional txt file. Because the file is general, we do not
+        keep track of the rhyme scheme and will rely on the rhyme dictionary 
+        for any rhymes.
+
+    '''
+    lines = []
+    num_unique_words = 0
+    word_map = {}
+    num_map = {}
+    rhyme_dict = {}
+    with open(file) as f:
+        for line in f:
+            #print line
+
+            line_split = re.findall(r"[\w']+|[.,!?;:]", line.strip('\n'))
+            if '' in line_split:
+                line_split = filter(lambda a: a != '', line_split)
+
+            if len(line_split) > 2:
+                coded_line = []
+                for word_raw in line_split:
+                    word = word_raw.lower()
+                    if word in word_map.keys():
+                        if not linear:
+                            coded_line.append(word_map[word])
+                        else:
+                            lines.append(word_map[word])
+                    else:
+                        if not linear:
+                            coded_line.append(num_unique_words)
+                        else:
+                            lines.append(num_unique_words)
+                        word_map[word] = num_unique_words
+                        num_map[num_unique_words] = word
+                        num_unique_words += 1
+            
+            if not linear:
+                    lines.append(coded_line)
+    return lines, word_map, num_map, {} # empty rhyme dict
+def import_full(linear=True, file="rap.txt"):
+    w, wm, np, rhyme_dict = import_shakespeare(linear=linear)
+    w_one, wm_one, _, _ = import_general(file=file, linear=linear)
+
+    index = len(wm.keys())
+
+    for key, val in wm_one.iteritems():
+        if key not in wm.keys():
+           wm[key] = index
+           assert index not in np.keys()
+           np[index] = key
+           index += 1
+    composite_w = w + w_one
+    return composite_w, wm, np, rhyme_dict
+
+
+
 def generate_emission(A, O, num_map, num_lines=14, syl_per_line=[10] * 14, rhyme_dict=None):
     '''
     Generates an emission of length M, assuming that the starting state
@@ -232,6 +289,7 @@ def print_rhyme_dict():
         new_dict[key] = list(val)
     with open('output.txt', 'w') as f:
         json.dump(new_dict, f)
+
 def visualize(A, O, num_map):
     L = len(A)
     M = len(O[0])

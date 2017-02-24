@@ -235,12 +235,15 @@ def generate_emission(A, O, num_map, num_lines=14, syl_per_line=[10] * 14, rhyme
 
                         if to_add != []:
                             word = np.random.choice(to_add)
-
+                    if word in ['i']:
+                        word = word.capitalize()
                     emission += ' ' + word
                     prev_rhymes[0] = prev_rhymes[1]
                     prev_rhymes[1] = word.lower().strip(PUNCTUATION)
 
                 else:
+                    if word in ['i']:
+                        word = word.capitalize()
                     # Lines shouldn't include this punctuation in the middle
                     if word not in PUNCTUATION:
                         emission += ' ' + word
@@ -442,9 +445,9 @@ def generate_rap(A, O, num_map, num_lines=20):
     prev_rhymes = [None, None, None]
     L = len(A)
     state = random.choice(range(L))
-    
+
     for line_count in range(num_lines):
-        if line_count % 5 == 0: 
+        if line_count % 5 == 0:
             emission += '\n'
         if line_count % 5 in [2, 3]:
             syl_per_line = 6
@@ -464,7 +467,7 @@ def generate_rap(A, O, num_map, num_lines=20):
                     # Lines should never start with punctuation
                     #if word not in PUNCTUATION:
                     emission += word.capitalize()
-                    
+
                 elif t + num_syl - syl_per_line == 0 or t + num_syl - syl_per_line == 1:
                     #t += syl_per_line # ending line
                     to_add = []
@@ -490,7 +493,7 @@ def generate_rap(A, O, num_map, num_lines=20):
 
                         if to_add != []:
                             word = np.random.choice(to_add)
-                           
+
                     emission += ' ' + word
                     prev_rhymes[0] = prev_rhymes[1]
                     prev_rhymes[1] = prev_rhymes[2]

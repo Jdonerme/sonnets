@@ -10,7 +10,7 @@ states = word_map.keys()
 n_states = len(states)
 
 print 'getting the model'
-model = MultinomialHMM(n_components=6, n_iter=1000)
+model = MultinomialHMM(n_components=6, n_iter=1500)
 print 'fitting'
 model.fit(lines)
 print 'Sonnet:'

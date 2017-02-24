@@ -341,13 +341,18 @@ def generate_limerick(A, O, num_map, num_lines=5, syl_per_line=[8, 8, 5, 5, 8], 
                                     if num_syllables(rhyme) == num_syl:
                                         to_add.append(rhyme)
                         if to_add != []:
+                            if word in ['i']:
+                                word = word.capitalize()
                             word = np.random.choice(to_add)
-
+                    if word in ['i']:
+                        word = word.capitalize()
                     emission += ' ' + word
 
                 else:
                     # Lines shouldn't include this punctuation in the middle
                     if word not in PUNCTUATION:
+                        if word in ['i']:
+                            word = word.capitalize()
                         emission += ' ' + word
                     elif word in ',!:;':
                        if emission[-1] not in PUNCTUATION:

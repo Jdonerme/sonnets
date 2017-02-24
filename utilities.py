@@ -140,6 +140,8 @@ def import_general(file='rap.txt', linear=False):
             line_split = re.findall(r"[\w']+|[.,!?;:]", line.strip('\n'))
             if '' in line_split:
                 line_split = filter(lambda a: a != '', line_split)
+            if '[' in line_split or ']' in line_split:
+                continue
 
             if len(line_split) > 2:
                 coded_line = []
@@ -321,6 +323,99 @@ def visualize(A, O, num_map):
             print num_map[word]
         print '\n'
 
+def generate_rap(A, O, num_map, num_lines=20):
+    '''
+    Generates an emission of length M, assuming that the starting state
+    is chosen uniformly at random.
+
+    Arguments:
+        M:          Length of the emission to generate.
+
+    Returns:
+        emission:   The randomly generated emission as a string.
+    '''
+
+    emission = ''
+    prev_rhymes = [None, None, None]
+    L = len(A)
+    state = random.choice(range(L))
+
+    line_count = -1
+    for l in range(num_lines):
+        line_count += 1
+        if line_count % 5 == 0: 
+            emission += '\n'
+        if line_count % 5 in [2, 3]:
+            syl_per_line = 5
+        else:
+            syl_per_line = random.choice([11, 12, 9, 10])
+        t = 0
+        while t < syl_per_line:
+            # Sample next observation.
+            next_obs = np.random.choice(range(len(O[state])), p=O[state])
+            word = num_map[next_obs]
+            num_syl = num_syllables(word)
+            if t + num_syl <= syl_per_line:
+
+                if word in PUNCTUATION:
+                    continue # too hard for raps
+                if t == 0:
+                    # Lines should never start with punctuation
+                    #if word not in PUNCTUATION:
+                    emission += word.capitalize()
+                    
+                elif t + num_syl - syl_per_line == 0:
+                    #t += syl_per_line # ending line
+                    to_add = []
+                    if line_count % 5 in [1, 3, 4]:
+                        prev = prev_rhymes[2]
+                        if line_count % 5 == 4:
+                            prev = prev_rhymes[0]
+
+                
+                        all_rhymes = pronouncing.rhymes(prev)
+                        common = list(set(num_map.values()).intersection(set(all_rhymes)))
+                        if common != []:
+                            for rhyme in common:
+                                if num_syllables(rhyme) == num_syl:
+                                    to_add.append(rhyme)
+                        else:
+                            for rhyme in all_rhymes:
+                                if num_syllables(rhyme) == num_syl:
+                                    to_add.append(rhyme)
+
+                        if to_add != []:
+                            word = np.random.choice(to_add)
+                           
+                            
+                    emission += ' ' + word
+                    prev_rhymes[0] = prev_rhymes[1]
+                    prev_rhymes[1] = prev_rhymes[2]
+                    prev_rhymes[2] = word.lower().strip(PUNCTUATION)
+                else:
+
+                    # Lines shouldn't include this punctuation in the middle
+                    if word not in PUNCTUATION:
+                        emission += ' ' + word
+                    elif word in ',!:;':
+                       if emission[-1] not in PUNCTUATION:
+                             emission +=  word
+
+                t += num_syl
+
+                # Sample next state.
+                next_state = np.random.choice(range(len(A[state])), p=A[state])
+                state = next_state
+        if word in '!.,:;?':
+            emission += word
+        else:
+            if l == num_lines-1:
+                emission += '.'
+            else:
+                emission += ','
+        emission += '\n'
+
+    return emission
 '''def main():
     s, _, n, rhyme_dict = import_shakespeare()
     #for line in s[17*14:18*14]:

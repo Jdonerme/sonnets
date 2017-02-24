@@ -10,7 +10,7 @@ states = word_map.keys()
 n_states = len(states)
 
 print 'getting the model'
-model = MultinomialHMM(n_components=6, n_iter=1500)
+model = MultinomialHMM(n_components=6, n_iter=10)
 print 'fitting'
 model.fit(lines)
 print 'Sonnet:'
@@ -19,6 +19,10 @@ print("{:30}".format(x))
 
 print 'Haiku:'
 x = ut.generate_emission(model.transmat_, model.emissionprob_, num_map, 3, [5, 7, 5])
+print("{:30}".format(x))
+
+print 'Limerick'
+x = ut.generate_limerick(model.transmat_, model.emissionprob_, num_map, 5, [8, 8, 5, 5, 8], rhyme_dict=rhyme_dict)
 print("{:30}".format(x))
 
 print 'visualizing'

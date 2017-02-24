@@ -73,7 +73,7 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
                 coded_line = []
                 for word_raw in line_split:
                     if word_raw in PUNCTUATION:
-                        continue # trying to make visualization better
+                        pass # trying to make visualization better
                     word = word_raw.lower()
 
                     if word in word_map.keys():
@@ -257,7 +257,7 @@ def visualize(A, O, num_map):
          words = heapq.nlargest(10, range(M), key=lambda k: O[state][k])
          words_per_state.append(words)
 
-    print words_per_state
+    #print words_per_state
     for state in range(L):
         print 'Most common words in state: ', state + 1
         for word in words_per_state[state]:

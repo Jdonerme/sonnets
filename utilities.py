@@ -6,6 +6,7 @@ import numpy as np
 import re
 import pronouncing
 import json
+import heapq
 
 SYLLABLE_DICT = cmudict.dict()
 PUNCTUATION = ",!?()'.:;"
@@ -71,6 +72,8 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
             if len(line_split) > 2:
                 coded_line = []
                 for word_raw in line_split:
+                    if word_raw in PUNCTUATION:
+                        continue # trying to make visualization better
                     word = word_raw.lower()
 
                     if word in word_map.keys():
@@ -229,6 +232,37 @@ def print_rhyme_dict():
         new_dict[key] = list(val)
     with open('output.txt', 'w') as f:
         json.dump(new_dict, f)
+def visualize(A, O, num_map):
+    L = len(A)
+    M = len(O[0])
+    x = range(M) #????
+    words_per_state = []
+    '''
+    probs = [[0. for _ in range(L)] for _ in range(M)]
+    
+    for i in range(L):
+        probs[0][i] = 1
+   
+    for obsv in range(1, M):
+        for state in range(L):
+            max_p = max(probs[obsv-1][k] * A[k][state] for k in range(L))
+            probs[obsv][state] = max_p * O[state][x[obsv]]
+
+            words =  heapq.nlargest(10, range(L), key=lambda k: probs[obsv-1][k] * A[k][state])
+            words_per_state.append(words)
+    '''
+    
+    for state in range(L):
+         #words =  heapq.nlargest(10, range(L), key=lambda k: A[k][state])
+         words = heapq.nlargest(10, range(M), key=lambda k: O[state][k])
+         words_per_state.append(words)
+
+    print words_per_state
+    for state in range(L):
+        print 'Most common words in state: ', state + 1
+        for word in words_per_state[state]:
+            print num_map[word]
+        print '\n'
 
 '''def main():
     s, _, n, rhyme_dict = import_shakespeare()

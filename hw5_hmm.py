@@ -374,6 +374,10 @@ def run_hmm(n_states, num_lines, verbose=False):
     x = ut.generate_emission(HMM.A, HMM.O, num_map, 3, [5, 7, 5])
     print("{:30}".format(x))
 
+    print 'visualizing'
+    ut.visualize(HMM.A, HMM.O, num_map)
+
+
 
 if __name__ == '__main__':
     print('')
@@ -385,4 +389,6 @@ if __name__ == '__main__':
     print('')
 
     # Number of states, number of M, number of lines
-    run_hmm(7, 14)
+    run_hmm(5, 14)
+
+    

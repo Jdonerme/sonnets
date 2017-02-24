@@ -290,7 +290,7 @@ class HiddenMarkovModel:
 
         return prob
 
-def unsupervised_HMM(X, n_states):
+def unsupervised_HMM(X, n_states, iters=10):
     '''
     Helper function to train an unsupervised HMM. The function determines the
     number of unique observations in the given data, initializes
@@ -329,11 +329,11 @@ def unsupervised_HMM(X, n_states):
 
     # Train an HMM with unlabeled data.
     HMM = HiddenMarkovModel(A, O)
-    HMM.unsupervised_learning(X)
+    HMM.unsupervised_learning(X, iters)
 
     return HMM
 
-def run_hmm(n_states, num_lines, verbose=False):
+def run_hmm(n_states, num_lines, iters=10, verbose=False):
     '''
     Trains an HMM using supervised learning on the file 'ron.txt' and
     prints the results.  Generates an emission of length M.
@@ -344,7 +344,7 @@ def run_hmm(n_states, num_lines, verbose=False):
     sonnets, word_map, num_map, rhyme_dict = ut.import_shakespeare()
 
     # Train the HMM.
-    HMM = unsupervised_HMM(sonnets, n_states)
+    HMM = unsupervised_HMM(sonnets, n_states, iters)
 
     if verbose:
         # Print the transition matrix.
@@ -389,6 +389,6 @@ if __name__ == '__main__':
     print('')
 
     # Number of states, number of M, number of lines
-    run_hmm(5, 14)
+    run_hmm(5, 14, 50)
 
     

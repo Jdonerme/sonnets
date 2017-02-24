@@ -164,18 +164,17 @@ def import_general(file='rap.txt', linear=False):
     return lines, word_map, num_map, {} # empty rhyme dict
 def import_full(linear=True, file="rap.txt"):
     w, wm, np, rhyme_dict = import_shakespeare(linear=linear)
-    w_one, wm_one, _, _ = import_general(file=file, linear=linear)
+    w_one, wm_one, n, _ = import_general(file=file, linear=linear)
 
     index = len(wm.keys())
-
     for key, val in wm_one.iteritems():
         if key not in wm.keys():
            wm[key] = index
            assert index not in np.keys()
            np[index] = key
            index += 1
-    composite_w = w + w_one
-    return composite_w, wm, np, rhyme_dict
+    w += w_one
+    return w, wm, np, rhyme_dict
 
 
 

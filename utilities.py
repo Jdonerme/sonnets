@@ -10,7 +10,9 @@ import heapq
 
 SYLLABLE_DICT = cmudict.dict()
 PUNCTUATION = ",!?()'.:;"
+
 def append_to_dict_set(d, word_raw, rhyme_raw, repeat=True):
+    '''Adds an object to the set of the rhyming dictionary.'''
     word = word_raw.strip(PUNCTUATION)
     rhyme = rhyme_raw.strip(PUNCTUATION)
     if word == '' or rhyme == '':
@@ -37,7 +39,7 @@ def append_to_dict_set(d, word_raw, rhyme_raw, repeat=True):
 
 
 def import_shakespeare(linear=False, file="shakespeare.txt"):
-    ''' imports a txt file in the format given of the shakespeare files.
+    ''' Imports a txt file in the format given in the Shakespeare files.
 
         Imports the file by constructing a 2D array where each element in
         the array contains a line of a sonnet.
@@ -46,7 +48,7 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
         Returns the sonnets array, word_map, and num_map.
         (word_map maps words to numbers and num_maps vice versa)
 
-        '''
+    '''
     LINES_IN_POEM = 14
     lines = []
     num_unique_words = 0
@@ -55,6 +57,7 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
     rhyme_dict = {}
     line_index = 1
     prev_rhymes = [None, None]
+
     with open(file) as f:
         for line in f:
             line_split = re.findall(r"[\w']+|[.,!?;:]", line.strip('\n'))
@@ -72,8 +75,6 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
             if len(line_split) > 2:
                 coded_line = []
                 for word_raw in line_split:
-                    if word_raw in PUNCTUATION:
-                        pass # trying to make visualization better
                     word = word_raw.lower()
 
                     if word in word_map.keys():
@@ -89,6 +90,7 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
                         word_map[word] = num_unique_words
                         num_map[num_unique_words] = word
                         num_unique_words += 1
+
                 if line_index == LINES_IN_POEM:
                     rhyme = prev_rhymes[1]
                     if word in PUNCTUATION:
@@ -120,6 +122,7 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
                 prev_rhymes[0], prev_rhymes[1] = None, None
                 line_index = 0
             line_index += 1
+
     return lines, word_map, num_map, rhyme_dict
 
 def import_general(file='rap.txt', linear=False):
@@ -135,8 +138,6 @@ def import_general(file='rap.txt', linear=False):
     rhyme_dict = {}
     with open(file) as f:
         for line in f:
-            #print line
-
             line_split = re.findall(r"[\w']+|[.,!?;:]", line.strip('\n'))
             if '' in line_split:
                 line_split = filter(lambda a: a != '', line_split)
@@ -165,7 +166,9 @@ def import_general(file='rap.txt', linear=False):
             if not linear:
                     lines.append(coded_line)
     return lines, word_map, num_map, {} # empty rhyme dict
+
 def import_full(linear=True, file="rap.txt"):
+    '''Imports both Shakespeare and general files.'''
     w, wm, np, rhyme_dict = import_shakespeare(linear=linear)
     w_one, wm_one, n, _ = import_general(file=file, linear=linear)
 
@@ -177,17 +180,13 @@ def import_full(linear=True, file="rap.txt"):
            np[index] = key
            index += 1
     w += w_one
+
     return w, wm, np, rhyme_dict
-
-
 
 def generate_emission(A, O, num_map, num_lines=14, syl_per_line=[10] * 14, rhyme_dict=None):
     '''
-    Generates an emission of length M, assuming that the starting state
+    Generates an emission, assuming that the starting state
     is chosen uniformly at random.
-
-    Arguments:
-        M:          Length of the emission to generate.
 
     Returns:
         emission:   The randomly generated emission as a string.
@@ -212,6 +211,7 @@ def generate_emission(A, O, num_map, num_lines=14, syl_per_line=[10] * 14, rhyme
                         emission += word.capitalize()
 
                 elif t + num_syl == syl_per_line[l] and rhyme_dict:
+                    # Attempt to make the appropriate lines rhyme
                     if l in [2, 3, 6, 7, 10, 11, 13]:
                         to_add = []
                         prev = prev_rhymes[0]
@@ -269,11 +269,8 @@ def generate_emission(A, O, num_map, num_lines=14, syl_per_line=[10] * 14, rhyme
 
 def generate_limerick(A, O, num_map, num_lines=5, syl_per_line=[8, 8, 5, 5, 8], rhyme_dict=None):
     '''
-    Generates an emission of length M, assuming that the starting state
+    Generates an emission, assuming that the starting state
     is chosen uniformly at random.
-
-    Arguments:
-        M:          Length of the emission to generate.
 
     Returns:
         emission:   The randomly generated emission as a string.
@@ -302,7 +299,6 @@ def generate_limerick(A, O, num_map, num_lines=5, syl_per_line=[8, 8, 5, 5, 8], 
                     if l == 0:
                         prev_rhymes[0] = word.lower().strip(PUNCTUATION)
                     if l == 2:
-                        #emission += ' ' + word
                         prev_rhymes[1] = word.lower().strip(PUNCTUATION)
                     elif l in [1, 4]:
                         prev = prev_rhymes[0]
@@ -375,6 +371,7 @@ def generate_limerick(A, O, num_map, num_lines=5, syl_per_line=[8, 8, 5, 5, 8], 
     return emission
 
 def num_syllables(word):
+    '''Get the number of syllables of the word.'''
     temp = word.lower().strip(PUNCTUATION)
     try:
         if temp == "":
@@ -394,7 +391,9 @@ def num_syllables(word):
         else:
             return 3
         return 1
+
 def print_rhyme_dict():
+    '''Print out the rhyme dictionary for testing.'''
     _, _, _, rhyme_dict = import_shakespeare()
     new_dict = {}
     for key, val in rhyme_dict.iteritems():
@@ -403,31 +402,16 @@ def print_rhyme_dict():
         json.dump(new_dict, f)
 
 def visualize(A, O, num_map):
+    '''Perform visualization on the states.'''
     L = len(A)
     M = len(O[0])
-    x = range(M) #????
+    x = range(M)
     words_per_state = []
-    '''
-    probs = [[0. for _ in range(L)] for _ in range(M)]
-
-    for i in range(L):
-        probs[0][i] = 1
-
-    for obsv in range(1, M):
-        for state in range(L):
-            max_p = max(probs[obsv-1][k] * A[k][state] for k in range(L))
-            probs[obsv][state] = max_p * O[state][x[obsv]]
-
-            words =  heapq.nlargest(10, range(L), key=lambda k: probs[obsv-1][k] * A[k][state])
-            words_per_state.append(words)
-    '''
 
     for state in range(L):
-         #words =  heapq.nlargest(10, range(L), key=lambda k: A[k][state])
          words = heapq.nlargest(10, range(M), key=lambda k: O[state][k])
          words_per_state.append(words)
 
-    #print words_per_state
     for state in range(L):
         print 'Most common words in state: ', state + 1
         for word in words_per_state[state]:
@@ -436,11 +420,8 @@ def visualize(A, O, num_map):
 
 def generate_rap(A, O, num_map, num_lines=20):
     '''
-    Generates an emission of length M, assuming that the starting state
+    Generates an emission, assuming that the starting state
     is chosen uniformly at random.
-
-    Arguments:
-        M:          Length of the emission to generate.
 
     Returns:
         emission:   The randomly generated emission as a string.
@@ -469,12 +450,9 @@ def generate_rap(A, O, num_map, num_lines=20):
                 if word in PUNCTUATION:
                     continue # too hard for raps
                 if t == 0:
-                    # Lines should never start with punctuation
-                    #if word not in PUNCTUATION:
                     emission += word.capitalize()
 
                 elif t + num_syl - syl_per_line == 0 or t + num_syl - syl_per_line == 1:
-                    #t += syl_per_line # ending line
                     to_add = []
                     if line_count % 5 in [1, 3, 4]:
                         prev = prev_rhymes[2]
@@ -527,22 +505,3 @@ def generate_rap(A, O, num_map, num_lines=20):
         emission += '\n'
 
     return emission
-'''def main():
-    s, _, n, rhyme_dict = import_shakespeare()
-    #for line in s[17*14:18*14]:
-    #    for word in line:
-    #       sys.stdout.write(str(n[word]) + " ")
-    #    print '\n'
-    return rhyme_dict
-'''
-
-'''s, _, num_map = import_shakespeare()
-count = 0
-for i in range(len(num_map)):
-    #print num_map[i]
-
-    val = num_syllables(num_map[i])
-    if val == False:
-        count += 1
-    print count
-'''

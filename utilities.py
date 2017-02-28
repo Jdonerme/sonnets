@@ -105,7 +105,8 @@ def import_shakespeare(linear=False, file="shakespeare.txt"):
                         rhyme_dict = append_to_dict_set(rhyme_dict, word, rhyme)
                         prev_rhymes[0] = prev_rhymes[1]
 
-                elif line_index in [3, 4, (LINES_IN_POEM - 7), (LINES_IN_POEM - 6), (LINES_IN_POEM - 3), (LINES_IN_POEM - 2)]:
+                elif line_index in [3, 4, (LINES_IN_POEM - 7), \
+                (LINES_IN_POEM - 6), (LINES_IN_POEM - 3), (LINES_IN_POEM - 2)]:
                     rhyme = prev_rhymes[0]
                     if word in PUNCTUATION:
                         word = line_split[-2].lower()
@@ -183,10 +184,11 @@ def import_full(linear=True, file="rap.txt"):
 
     return w, wm, np, rhyme_dict
 
-def generate_emission(A, O, num_map, num_lines=14, syl_per_line=[10] * 14, rhyme_dict=None):
+def generate_emission(A, O, num_map, num_lines=14, syl_per_line=[10] * 14, \
+    rhyme_dict=None):
     '''
     Generates an emission, assuming that the starting state
-    is chosen uniformly at random.
+    is chosen uniformly at random. Can be used to generate haikus and sonnets.
 
     Returns:
         emission:   The randomly generated emission as a string.
@@ -223,7 +225,8 @@ def generate_emission(A, O, num_map, num_lines=14, syl_per_line=[10] * 14, rhyme
                                     to_add.append(rhyme)
                         if to_add == []:
                             all_rhymes = pronouncing.rhymes(prev)
-                            common = list(set(num_map.values()).intersection(set(all_rhymes)))
+                            common = list(set(num_map.values()).intersection( \
+                            set(all_rhymes)))
                             if common != []:
                                 for rhyme in common:
                                     if num_syllables(rhyme) == num_syl:
@@ -267,9 +270,10 @@ def generate_emission(A, O, num_map, num_lines=14, syl_per_line=[10] * 14, rhyme
 
     return emission
 
-def generate_limerick(A, O, num_map, num_lines=5, syl_per_line=[8, 8, 5, 5, 8], rhyme_dict=None):
+def generate_limerick(A, O, num_map, num_lines=5, syl_per_line=[8, 8, 5, 5, 8], \
+    rhyme_dict=None):
     '''
-    Generates an emission, assuming that the starting state
+    Generates an limerick, assuming that the starting state
     is chosen uniformly at random.
 
     Returns:
@@ -308,7 +312,8 @@ def generate_limerick(A, O, num_map, num_lines=5, syl_per_line=[8, 8, 5, 5, 8], 
                                     to_add.append(rhyme)
                         if to_add == []:
                             all_rhymes = pronouncing.rhymes(prev)
-                            common = list(set(num_map.values()).intersection(set(all_rhymes)))
+                            common = list(set(num_map.values()).intersection(\
+                            set(all_rhymes)))
                             if common != []:
                                 for rhyme in common:
                                     if num_syllables(rhyme) == num_syl:
@@ -327,7 +332,8 @@ def generate_limerick(A, O, num_map, num_lines=5, syl_per_line=[8, 8, 5, 5, 8], 
                                     to_add.append(rhyme)
                         if to_add == []:
                             all_rhymes = pronouncing.rhymes(prev)
-                            common = list(set(num_map.values()).intersection(set(all_rhymes)))
+                            common = list(set(num_map.values()).intersection(\
+                            set(all_rhymes)))
                             if common != []:
                                 for rhyme in common:
                                     if num_syllables(rhyme) == num_syl:
@@ -420,7 +426,7 @@ def visualize(A, O, num_map):
 
 def generate_rap(A, O, num_map, num_lines=20):
     '''
-    Generates an emission, assuming that the starting state
+    Generates a rap, assuming that the starting state
     is chosen uniformly at random.
 
     Returns:
@@ -452,7 +458,8 @@ def generate_rap(A, O, num_map, num_lines=20):
                 if t == 0:
                     emission += word.capitalize()
 
-                elif t + num_syl - syl_per_line == 0 or t + num_syl - syl_per_line == 1:
+                elif t + num_syl - syl_per_line == 0 or \
+                t + num_syl - syl_per_line == 1:
                     to_add = []
                     if line_count % 5 in [1, 3, 4]:
                         prev = prev_rhymes[2]
@@ -460,18 +467,23 @@ def generate_rap(A, O, num_map, num_lines=20):
                             prev = prev_rhymes[0]
 
                         all_rhymes = pronouncing.rhymes(prev)
-                        common = list(set(num_map.values()).intersection(set(all_rhymes)))
+                        common = list(set(num_map.values()).intersection(\
+                        set(all_rhymes)))
                         if common != []:
                             for rhyme in common:
-                                if num_syllables(rhyme) == num_syl or num_syllables(rhyme) == num_syl - 1:
+                                if num_syllables(rhyme) == num_syl or\
+                                 num_syllables(rhyme) == num_syl - 1:
                                     to_add.append(rhyme)
                         else:
                             for rhyme in all_rhymes:
-                                if (num_syllables(rhyme) == num_syl or num_syllables(rhyme) == num_syl - 1) and len(rhyme) > 1:
+                                if (num_syllables(rhyme) == num_syl or \
+                                num_syllables(rhyme) == num_syl - 1) \
+                                and len(rhyme) > 1:
                                     to_add.append(rhyme)
                             if to_add == []:
                                 for rhyme in all_rhymes:
-                                    if (num_syllables(rhyme) == num_syl or num_syllables(rhyme) == num_syl - 1):
+                                    if (num_syllables(rhyme) == num_syl or \
+                                    num_syllables(rhyme) == num_syl - 1):
                                         to_add.append(rhyme)
 
                         if to_add != []:

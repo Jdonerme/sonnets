@@ -174,9 +174,7 @@ class HiddenMarkovModel:
         '''
         # Initialize HMM model parameters
         # Assume with M states
-        # is every list in the list a training example
-        #Do we run forwards + backwards on each one and then do m step on the alphas + betas
-        # wat are the ps on piazza
+        
         for iteration in range(iters):
             print("Iteration: " + str(iteration))
 
@@ -390,5 +388,3 @@ if __name__ == '__main__':
 
     # Number of states, number of M, number of lines
     run_hmm(5, 14, 50)
-
-    
